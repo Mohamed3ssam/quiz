@@ -73,7 +73,7 @@ class Quiz extends Component {
 			checkAnswer[this.props.currentQuesId].toLowerCase() ===
 			this.props.userAnswer[this.props.currentQuesId].toLowerCase()
 		) {
-			alert("right answer");
+			
 
 			this.setState(
 				{
@@ -113,7 +113,7 @@ class Quiz extends Component {
 			return this.resultHandler(
 				"/Result",
 				"Game Over",
-				"Wrong Amswer",
+				"Wrong Answer",
 				"The Right Answer is:",
 				this.props.checkData[this.props.checkData.length - 1][this.props.currentQuesId]
 			);
