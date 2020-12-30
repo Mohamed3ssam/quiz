@@ -28,7 +28,6 @@ export const initQuestions = () => {
 				dispatch(setQuestion(response.data));
 			})
 			.catch((error) => {
-				console.log(error);
 				dispatch(fetchQuestionFaild());
 			});
 	};

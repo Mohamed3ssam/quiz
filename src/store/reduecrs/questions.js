@@ -19,6 +19,7 @@ const reducer = (state = initialState, action) => {
 
 		case actionTypes.SET_QUESTION:
 			let [data] = action.questions.map((el) => {
+				console.log([state.questionCheck]);
 				let id = el.id,
 					questionTitle = el.category.title,
 					question = el.question,
@@ -43,6 +44,8 @@ const reducer = (state = initialState, action) => {
 		case actionTypes.FETCH_QUESTION_FAILD:
 			return {
 				...state,
+				question: null,
+				currentId: null,
 				error: true,
 			};
 

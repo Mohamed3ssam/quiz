@@ -7,6 +7,8 @@ import { Redirect } from "react-router";
 import QuestionContainer from "../../components/question/QuestionContainer";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import Header from "../../components/Header/Header";
+import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
+import axios from "../../axios";
 
 class Quiz extends Component {
 	state = {
@@ -25,27 +27,20 @@ class Quiz extends Component {
 		this.startTimeOut();
 	}
 
-	timeOut = () => {
-		setTimeout(() => {
-			this.setState({ timeOut: true });
-		}, 30000);
-	};
 	startTimeOut = () => {
-		this.timeout = this.timeOut();
-
 		this.startTime = setInterval(() => {
 			this.setState({ timeValue: this.state.timeValue - 1 });
 		}, 1000);
 	};
 
 	componentWillUnmount() {
-		clearTimeout(this.timeout);
 		clearInterval(this.startTime);
 	}
 
 	componentDidUpdate() {
 		if (this.state.timeValue === 0) {
 			clearInterval(this.startTime);
+			this.setState({ timeOut: true });
 		}
 	}
 
@@ -73,8 +68,6 @@ class Quiz extends Component {
 			checkAnswer[this.props.currentQuesId].toLowerCase() ===
 			this.props.userAnswer[this.props.currentQuesId].toLowerCase()
 		) {
-			
-
 			this.setState(
 				{
 					timeValue: 30,
@@ -84,8 +77,8 @@ class Quiz extends Component {
 				},
 				() => {
 					this.props.onQuestionInit();
-					clearTimeout(this.timeout);
-					this.timeout = this.timeOut();
+					clearInterval(this.startTime);
+					this.startTimeOut();
 				}
 			);
 		} else {
@@ -109,11 +102,14 @@ class Quiz extends Component {
 	};
 
 	render() {
+		if (this.props.networkError) {
+			clearInterval(this.startTime);
+		}
 		if (this.state.wrongAnswer) {
 			return this.resultHandler(
 				"/Result",
 				"Game Over",
-				"Wrong Answer",
+				"Wrong Amswer",
 				"The Right Answer is:",
 				this.props.checkData[this.props.checkData.length - 1][this.props.currentQuesId]
 			);
@@ -144,6 +140,7 @@ class Quiz extends Component {
 		) : (
 			<Spinner />
 		);
+
 		return (
 			<Aux>
 				<Header
@@ -164,7 +161,7 @@ const mapStateToProps = (state) => {
 		titleQus: state.questions.questionTitle,
 		checkData: state.questions.questionCheck,
 		currentQuesId: state.questions.currentId,
-		time: state.time,
+		networkError: state.questions.error,
 		userAnswer: state.answers.userAnswer,
 	};
 };
@@ -176,4 +173,4 @@ const mapDispatchToProps = (dispatch) => {
 		setResultAnswer: (answerData) => dispatch(questionAction.setAnswer(answerData)),
 	};
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Quiz);
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(Quiz, axios));
